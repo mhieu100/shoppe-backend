@@ -43,4 +43,4 @@ Shoppe is a RESTful API backend for an e-commerce platform, built with **Spring 
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/mhieu100/shoppe-backend.git
-   cd shoppe
+   cd shoppe-backend
