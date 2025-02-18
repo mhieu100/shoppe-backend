@@ -9,20 +9,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-//import com.project.model.Response;
+import com.project.model.Response;
 
 @RestControllerAdvice
 public class GlobalException {
-//    @ExceptionHandler(value = {
-//            NotFoundException.class,
-//    })
-//    public ResponseEntity<Response<Object>> handleException(Exception ex) {
-//        Response<Object> res = new Response<>();
-//        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-//        res.setError(ex.getMessage());
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
-//    }
-
+  
+    @ExceptionHandler(value = {
+            NotFoundException.class,
+            ExistException.class
+    })
+    public ResponseEntity<Response<Object>> handleException(Exception ex) {
+        Response<Object> res = new Response<>();
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    }
+      
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String,String>> handleValidationException(MethodArgumentNotValidException ex){
         Map<String, String> errors = new HashMap<>();
