@@ -11,6 +11,7 @@ import com.project.model.Response;
 public class GlobalException {
     @ExceptionHandler(value = {
             NotFoundException.class,
+            ExistException.class
     })
     public ResponseEntity<Response<Object>> handleException(Exception ex) {
         Response<Object> res = new Response<>();
