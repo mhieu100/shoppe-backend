@@ -24,6 +24,6 @@ public class Discount {
     @Column(name = "used_count")
     private int usedCount;
 
-    @OneToMany(mappedBy = "discount")
-    private List<Discount> discounts;
+//    @OneToMany(mappedBy = "discount")
+//    private List<Discount> discounts;
 }
