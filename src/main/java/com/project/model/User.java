@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     int id;
+     Integer id;
 
     @Column(nullable = false)
     @NotBlank(message = "Name is not empty")
