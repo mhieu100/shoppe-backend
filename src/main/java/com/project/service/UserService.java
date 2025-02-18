@@ -20,15 +20,8 @@ import com.project.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
-import com.project.enums.Role;
 import com.project.exception.AlreadyEmailExistException;
-import com.project.model.User;
-import com.project.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -73,15 +66,15 @@ public class UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ExistException("Email đã tồn tài : " + user.getEmail());
         }
-        // String hashPassword = this.passwordEncoder.encode(user.getPassword());
-        // user.setPassword(hashPassword);
+        String hashPassword = this.passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashPassword);
         user.setRoles(Collections.singleton(Role.CUSTOMER));
         User savedUser = userRepository.save(user);
 
         return convertToUserDTO(savedUser);
     }
 
-    public UserDTO updateUser(Long id, User user) throws NotFoundException {
+    public UserDTO updateUser(Integer id, User user) throws NotFoundException {
         Optional<User> currentUser = userRepository.findById(id);
         if (currentUser.isEmpty()) {
             throw new NotFoundException("Không tìm thấy người dùng : " + id);
@@ -90,29 +83,27 @@ public class UserService {
         currentUser.get().setEmail(user.getEmail());
         currentUser.get().setPhoneNumber(user.getPhoneNumber());
         currentUser.get().setAddress(user.getAddress());
-        // currentUser.get().setRoles(user.getRoles());
         currentUser.get().setGender(user.getGender());
 
         return convertToUserDTO(userRepository.save(currentUser.get()));
 
     }
 
-    public void deleteUser(Long id) throws NotFoundException {
+    public void deleteUser(Integer id) throws NotFoundException {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new NotFoundException("Không tìm thấy người dùng : " + id);
         }
         userRepository.deleteById(id);
+    }
 
- 
-
-    public User registerUser(User user){
-        if(userRepository.existsByEmail(user.getEmail())){
-            throw  new AlreadyEmailExistException("email already exist! Please try again");
+    public User registerUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new AlreadyEmailExistException("email already exist! Please try again");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(user.getRoles() ==null || user.getRoles().isEmpty()){
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(Collections.singleton(Role.CUSTOMER));
         }
         return userRepository.save(user);

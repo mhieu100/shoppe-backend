@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -50,7 +50,6 @@ public class AuthController {
                 "refreshToken",refreshToken
         ));
     }
-
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody String refreshToken) {

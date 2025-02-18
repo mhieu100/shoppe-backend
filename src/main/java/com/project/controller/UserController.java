@@ -43,13 +43,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody User user)
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Integer id, @Valid @RequestBody User user)
             throws NotFoundException {
         return ResponseEntity.ok().body(userService.updateUser(id, user));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) throws NotFoundException {
+    public void deleteUser(@PathVariable Integer id) throws NotFoundException {
         userService.deleteUser(id);
     }
 }
