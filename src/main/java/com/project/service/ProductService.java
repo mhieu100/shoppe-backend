@@ -5,6 +5,7 @@ import com.project.dto.ProductDTO;
 import com.project.dto.ProductImageDTO;
 import com.project.dto.ProductResponseDTO;
 import com.project.exception.ExistException;
+import com.project.model.Category;
 import com.project.model.Product;
 import com.project.model.ProductImage;
 import com.project.model.User;
@@ -38,17 +39,14 @@ public class ProductService {
 
     public ProductResponseDTO addProduct(ProductDTO productDTO, MultipartFile[] images) {
 
-//        Category category = categoryRepository.findById(productDTO.getCategoryId())
-//                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
         User user = userRepository.findById(7)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         System.out.println(Arrays.toString(images));
         Product product = new Product();
-        if (productDTO.getCategoryId() == 0) {
-            product.setCategory(null);
-        }
 
-//        product.setCategory(category);
+        product.setCategory(category);
         product.setUser(user);
         product.setName(productDTO.getName());
         product.setDescriptions(productDTO.getDescriptions());
@@ -80,34 +78,37 @@ public class ProductService {
     public ProductResponseDTO updateProduct(Integer id, ProductDTO productDTO, MultipartFile[] images) throws ExistException {
         Product product = productRepository.findById(id).orElseThrow(() -> new ExistException("Product not found"));
 
-//        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(() -> new ExistException("Category not found"));
+        Category category = categoryRepository.findById(productDTO.getCategoryId()).orElseThrow(() -> new ExistException("Category not found"));
 
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setDescriptions(productDTO.getDescriptions());
         product.setStockQuantity(productDTO.getStockQuantity());
-//        product.setCategory(category);
-        if (productDTO.getCategoryId() == 0) {
-            product.setCategory(null);
-        }
+        product.setCategory(category);
+
+        User user = userRepository.findById(7)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        product.setUser(user);
 
         product.setUpdate_at(new Date());
 
         Product updatedProduct = productRepository.save(product);
 
-        for (MultipartFile image : images) {
-            try {
-                Map uploadResult = cloudinaryService.upload(image, "products");
+        if (images != null) {
+            for (MultipartFile image : images) {
+                try {
+                    Map uploadResult = cloudinaryService.upload(image, "products");
 
-                ProductImage productImage = new ProductImage();
-                productImage.setProduct(updatedProduct);
-                productImage.setImageUrl(uploadResult.get("url").toString());
-                productImage.setPublicId(uploadResult.get("public_id").toString());
-                productImage.setIsPrimary(false);
-                productImage.setCreated_at(new Date());
-                productImageRepository.save(productImage);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to add image to product");
+                    ProductImage productImage = new ProductImage();
+                    productImage.setProduct(updatedProduct);
+                    productImage.setImageUrl(uploadResult.get("url").toString());
+                    productImage.setPublicId(uploadResult.get("public_id").toString());
+                    productImage.setIsPrimary(false);
+                    productImage.setCreated_at(new Date());
+                    productImageRepository.save(productImage);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to add image to product");
+                }
             }
         }
 
