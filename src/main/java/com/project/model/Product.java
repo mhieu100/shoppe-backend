@@ -1,6 +1,7 @@
 package com.project.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotBlank(message = "Name is not empty")
     private String name;
+
+    @NotBlank(message = "Description is not empty")
     private String descriptions;
 
     @Column(precision = 10, scale = 3)
@@ -30,13 +34,16 @@ public class Product {
     private int stockQuantity;
 
     @ManyToOne
-    @JoinColumn(name="category_id")
+    @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date create_at;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date update_at;
-
 }

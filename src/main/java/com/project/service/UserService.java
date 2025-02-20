@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import com.project.dto.Pagination;
@@ -41,9 +42,9 @@ public class UserService {
         return res;
     }
 
-    public Pagination getAllUsers(Specification<User> specification, Pageable pageable) {
+    public Pagination<P> getAllUsers(Specification<User> specification, Pageable pageable) {
         Page<User> pageUser = userRepository.findAll(specification, pageable);
-        Pagination pagination = new Pagination();
+        Pagination<P> pagination = new Pagination<P>();
         Pagination.Meta meta = new Pagination.Meta();
 
         meta.setPage(pageable.getPageNumber() + 1);

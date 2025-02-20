@@ -1,10 +1,16 @@
 package com.project.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "product_images")
 public class ProductImage {
     @Id
@@ -17,6 +23,10 @@ public class ProductImage {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name = "public_id")
+    private String publicId;
+
     @Column(name = "is_primary")
     private Boolean isPrimary;
 
