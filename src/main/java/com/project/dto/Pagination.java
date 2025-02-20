@@ -3,7 +3,7 @@ package com.project.dto;
 import lombok.Data;
 
 @Data
-public class Pagination {
+public class Pagination<P> {
     private Meta meta;
     private Object result;
 
