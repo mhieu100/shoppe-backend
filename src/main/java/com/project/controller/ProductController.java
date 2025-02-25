@@ -11,6 +11,9 @@ import com.project.repository.ProductRepository;
 import com.project.service.ProductImageService;
 import com.project.service.ProductService;
 import com.turkraft.springfilter.boot.Filter;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,25 +26,16 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
     @Autowired
     private final ProductService productService;
-
-    @Autowired
-    private ProductRepository productRepository;
 
     @Autowired
     private final ProductImageService productImageService;
 
     @Autowired
     private final ProductImageRepository productImageRepository;
-
-    public ProductController(ProductService productService, ProductImageService productImageService,
-            ProductImageRepository productImageRepository) {
-        this.productService = productService;
-        this.productImageService = productImageService;
-        this.productImageRepository = productImageRepository;
-    }
 
     @GetMapping
     public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification,
