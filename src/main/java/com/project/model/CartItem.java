@@ -1,9 +1,11 @@
 package com.project.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "cart_item")
+@Data
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +15,7 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private ShoppingCart cart;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name="product_id",referencedColumnName = "id")
     private Product product;
 

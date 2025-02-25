@@ -16,6 +16,4 @@ public class ProductDTO {
     private BigDecimal price;
     private int stockQuantity;
     private int categoryId;
-
-    // Getters và Setters
 }

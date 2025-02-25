@@ -1,6 +1,5 @@
 package com.project.controller;
 
-
 import com.project.dto.Pagination;
 import com.project.dto.ProductDTO;
 import com.project.dto.ProductResponseDTO;
@@ -12,6 +11,9 @@ import com.project.repository.ProductRepository;
 import com.project.service.ProductImageService;
 import com.project.service.ProductService;
 import com.turkraft.springfilter.boot.Filter;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,12 +26,10 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
     @Autowired
     private final ProductService productService;
-
-    @Autowired
-    private ProductRepository productRepository;
 
     @Autowired
     private final ProductImageService productImageService;
@@ -37,14 +37,9 @@ public class ProductController {
     @Autowired
     private final ProductImageRepository productImageRepository;
 
-    public ProductController(ProductService productService, ProductImageService productImageService, ProductImageRepository productImageRepository) {
-        this.productService = productService;
-        this.productImageService = productImageService;
-        this.productImageRepository = productImageRepository;
-    }
-
     @GetMapping
-    public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification, Pageable pageable) {
+    public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification,
+            Pageable pageable) {
         return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable));
     }
 
@@ -56,16 +51,17 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(@ModelAttribute ProductDTO productDTO,
-                                                 @RequestParam("images") MultipartFile[] images) {
+            @RequestParam("images") MultipartFile[] images) {
 
         ProductResponseDTO product = productService.addProduct(productDTO, images);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") int id, @ModelAttribute ProductDTO product,
-                                                 @RequestParam(value = "images",required = false) MultipartFile[] images) throws ExistException {
-        ProductResponseDTO product1 = productService.updateProduct(id,product,images);
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") int id,
+            @ModelAttribute ProductDTO product,
+            @RequestParam(value = "images", required = false) MultipartFile[] images) throws ExistException {
+        ProductResponseDTO product1 = productService.updateProduct(id, product, images);
         return ResponseEntity.ok().body(product1);
     }
 
@@ -78,11 +74,12 @@ public class ProductController {
 
     @PutMapping("/{productId}/replace-image/{imageId}")
     public ResponseEntity<ProductImage> replaceImage(@PathVariable("productId") int productId,
-                                                     @PathVariable("imageId") int imageId,
-                                                     @RequestParam("image") MultipartFile image) throws ExistException {
-        ProductImage productImage = productImageRepository.findById(imageId).orElseThrow(()-> new ExistException("Image not found"));
+            @PathVariable("imageId") int imageId,
+            @RequestParam("image") MultipartFile image) throws ExistException {
+        ProductImage productImage = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new ExistException("Image not found"));
 
-        ProductImage updateProductImage = productImageService.replaceImage(productImage.getPublicId(),image);
+        ProductImage updateProductImage = productImageService.replaceImage(productImage.getPublicId(), image);
         return ResponseEntity.ok().body(updateProductImage);
     }
 
