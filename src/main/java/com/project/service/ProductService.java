@@ -177,8 +177,9 @@ public class ProductService {
             productResponseDTO.setCategoryName(product.getCategory().getName());
         }
 
-        productResponseDTO.setSellerName(product.getUser().getFullname());
-
+        if (product.getUser() != null) {
+            productResponseDTO.setSellerName(product.getUser().getFullname());
+        }
         List<ProductImageDTO> images = productImageRepository.findByProduct(product).stream()
                 .map(image -> new ProductImageDTO(image.getId(), image.getImageUrl()))
                 .collect(Collectors.toList());

@@ -10,11 +10,12 @@ import com.project.model.Response;
 
 @RestControllerAdvice
 public class GlobalException {
-  
+
     @ExceptionHandler(value = {
             NotFoundException.class,
             ExistException.class,
-            AlreadyEmailExistException.class
+            AlreadyEmailExistException.class,
+            NotAllowException.class
     })
     public ResponseEntity<Response<Object>> handleException(Exception ex) {
         Response<Object> res = new Response<>();
