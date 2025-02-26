@@ -1,9 +1,17 @@
 package com.project.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +26,8 @@ public class OrderItem {
     private Product product;
 
     private int quantity;
-    private double price;
+
+    @Column(precision = 10, scale = 3)
+    private BigDecimal price;
 }
 

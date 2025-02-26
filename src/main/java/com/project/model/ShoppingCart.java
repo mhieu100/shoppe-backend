@@ -1,7 +1,9 @@
 package com.project.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -9,18 +11,20 @@ import java.util.List;
 @Entity
 @Table(name = "shopping_cart")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
 
     @OneToOne
-    @JoinColumn(name = "user_id",nullable = false,unique = true)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<CartItem> cartItems;
+    private List<CartItem> cartItems;
 }
