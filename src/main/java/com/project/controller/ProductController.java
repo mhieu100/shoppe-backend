@@ -7,7 +7,6 @@ import com.project.exception.ExistException;
 import com.project.model.Product;
 import com.project.model.ProductImage;
 import com.project.repository.ProductImageRepository;
-import com.project.repository.ProductRepository;
 import com.project.service.ProductImageService;
 import com.project.service.ProductService;
 import com.turkraft.springfilter.boot.Filter;

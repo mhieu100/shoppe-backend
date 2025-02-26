@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.dto.CartDTO;
+import com.project.exception.NotFoundException;
 import com.project.service.CartService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<CartDTO> getAllProductInCartOfMe() {
+    public ResponseEntity<CartDTO> getAllProductInCartOfMe() throws NotFoundException {
         return ResponseEntity.ok().body(cartService.getAllProductInCartOfMe());
     }
     
@@ -50,5 +51,12 @@ public class CartController {
     public ResponseEntity<String> removeProduct(@PathVariable Integer id) {
         cartService.removeProduct(id);
         return ResponseEntity.ok("Product removed from cart");
+    }
+
+
+    @DeleteMapping("/remove-all")
+    public ResponseEntity<String> removeAllProduct() {
+        cartService.removeAllProduct();
+        return ResponseEntity.ok("Product removed All from cart");
     }
 }

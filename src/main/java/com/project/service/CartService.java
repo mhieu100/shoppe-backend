@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.dto.CartDTO;
 import com.project.dto.CartItemDTO;
+import com.project.exception.NotFoundException;
 import com.project.model.CartItem;
 import com.project.model.Product;
 import com.project.model.ShoppingCart;
@@ -63,11 +64,14 @@ public class CartService {
         }
     }
 
-    public CartDTO getAllProductInCartOfMe() {
+    public CartDTO getAllProductInCartOfMe() throws NotFoundException {
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
         User user = userRepository.findByEmail(email).get();
         ShoppingCart cart = cartRepository.findByUser(user);
+        if (cart == null) {
+            throw new NotFoundException("Cart is empty");
 
+        }
         CartDTO cartDTO = new CartDTO();
         cartDTO.setId(cart.getId());
         cartDTO.setUserName(user.getUsername());
@@ -113,6 +117,14 @@ public class CartService {
             productRepository.save(product);
             cartItemRepository.delete(cartItem);
         });
+    }
+
+    public void removeAllProduct() {
+        String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
+        User user = userRepository.findByEmail(email).get();
+        ShoppingCart cart = cartRepository.findByUser(user);
+        cartRepository.delete(cart);
+
     }
 
 }
