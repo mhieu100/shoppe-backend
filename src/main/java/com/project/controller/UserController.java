@@ -34,7 +34,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Pagination<P>> getAllUsers(@Filter Specification<User> specification,
-                                                     Pageable pageable) {
+            Pageable pageable) {
         return ResponseEntity.ok().body(userService.getAllUsers(specification, pageable));
     }
 

@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,5 +45,10 @@ public class OrderController {
     public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable int id, @RequestBody Map<String, String> requestData) throws NotFoundException {
         OrderDTO orderDTO = orderService.updateOrderStatus(id, String.valueOf(requestData.get("status")));
         return ResponseEntity.ok(orderDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderDTO>> getOrderOfMe()  {
+        return ResponseEntity.ok(orderService.getOrderOfMe());
     }
 }

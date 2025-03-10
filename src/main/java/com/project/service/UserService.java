@@ -39,6 +39,7 @@ public class UserService {
         res.setAddress(user.getAddress());
         res.setRoles(user.getRoles());
         res.setGender(user.getGender());
+        res.setBirthday(user.getBirthday());
         return res;
     }
 
@@ -67,7 +68,7 @@ public class UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ExistException("Email đã tồn tài : " + user.getEmail());
         }
-        String hashPassword = this.passwordEncoder.encode(user.getPassword());
+        String hashPassword = this.passwordEncoder.encode("123456");
         user.setPassword(hashPassword);
         user.setRoles(Collections.singleton(Role.CUSTOMER));
         User savedUser = userRepository.save(user);
@@ -95,12 +96,14 @@ public class UserService {
         if (user.isEmpty()) {
             throw new NotFoundException("Không tìm thấy người dùng : " + id);
         }
+        user.get().getRoles().clear();
+        userRepository.save(user.get());
         userRepository.deleteById(id);
     }
 
     public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new AlreadyEmailExistException("email already exist! Please try again");
+            throw new AlreadyEmailExistException("Email đã tồn tại: " + user.getEmail());
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

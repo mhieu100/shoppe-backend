@@ -1,6 +1,5 @@
 package com.project.service;
 
-
 import com.project.dto.*;
 import com.project.enums.OrderStatus;
 import com.project.enums.PaymentMethod;
@@ -36,7 +35,8 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final PaymentRepository paymentRepository;
 
-    public OrderDTO createDirectOrder(int product_id, OrderRequestDTO orderRequest) throws ExistException, NotAllowException {
+    public OrderDTO createDirectOrder(int product_id, OrderRequestDTO orderRequest)
+            throws ExistException, NotAllowException {
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
         User user = userRepository.findByEmail(email).get();
 
@@ -51,7 +51,8 @@ public class OrderService {
 
         List<OrderItem> orderItems = new ArrayList<>();
 
-        Product product = productRepository.findById(product_id).orElseThrow(() -> new ExistException("Product not found"));
+        Product product = productRepository.findById(product_id)
+                .orElseThrow(() -> new ExistException("Product not found"));
 
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(product);
@@ -88,7 +89,8 @@ public class OrderService {
             throw new ExistException("Shopping cart not found");
         }
 
-        List<CartItemDTO> cartItemDTOS = shoppingCart.getCartItems().stream().map(CartItemDTO::new).collect(Collectors.toList());
+        List<CartItemDTO> cartItemDTOS = shoppingCart.getCartItems().stream().map(CartItemDTO::new)
+                .collect(Collectors.toList());
 
         if (cartItemDTOS.isEmpty()) {
             throw new ExistException("Cart is empty, cannot place order.");
@@ -115,7 +117,8 @@ public class OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getProduct().getPrice());
 
-            totalAmount = totalAmount.add(cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+            totalAmount = totalAmount
+                    .add(cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
 
             orderItems.add(orderItem);
         }
@@ -127,10 +130,6 @@ public class OrderService {
 
         createPayment(orderSaved, totalAmount, orderRequest.getPaymentMethod());
 
-//        for (CartItem cartItem : shoppingCart.getCartItems()) {
-//            cartItemRepository.deleteById(cartItem.getId());
-//        }
-        System.out.println("cart id" + shoppingCart.getId());
         cartItemRepository.deleteAllByCartId(shoppingCart.getId());
         return convertToDTO(orderSaved);
     }
@@ -178,7 +177,6 @@ public class OrderService {
         return pagination;
     }
 
-
     public OrderDTO updateOrderStatus(int id, String status) throws NotFoundException {
         Optional<Order> order = orderRepository.findById(id);
         if (order.isEmpty()) {
@@ -191,5 +189,16 @@ public class OrderService {
 
         return convertToDTO(orderSaved);
     }
-}
 
+    public List<OrderDTO> getOrderOfMe() {
+        String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
+        User user = userRepository.findByEmail(email).get();
+
+        List<Order> order = orderRepository.findByUser(user);
+
+        List<OrderDTO> listOrderDTO = order.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return listOrderDTO;
+    }
+}

@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     Integer id;
+    Integer id;
 
     @Column(nullable = false)
     @NotBlank(message = "Name is not empty")
-     String fullname;
+    String fullname;
 
     @Column(nullable = false)
     @NotBlank(message = "Email is not empty")
@@ -40,31 +40,30 @@ public class User implements UserDetails {
     String email;
 
     @Column(nullable = false)
-    @NotBlank(message = "Passwork is not empty")
     String password;
 
     @Column(name = "phone_number")
-     String phoneNumber;
+    String phoneNumber;
 
-     String address;
+    String address;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
-     Set<Role> roles;
+    Set<Role> roles;
 
     @Enumerated(EnumType.STRING)
-     Gender gender;
+    Gender gender;
 
     @Temporal(TemporalType.TIMESTAMP)
-     Date birthday;
+    Date birthday;
 
-     String refreshToken;
+    String refreshToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" +role.name()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
     }
 
