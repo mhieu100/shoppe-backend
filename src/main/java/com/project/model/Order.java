@@ -30,9 +30,6 @@ public class Order {
     @Temporal(TemporalType.TIMESTAMP)
     private Date order_date;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
     @Column(name = "totla_amount", precision = 10, scale = 3)
     private BigDecimal totalAmount;
 
@@ -44,4 +41,11 @@ public class Order {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated_at;
+
+    public BigDecimal calculateApprovedTotal() {
+        return orderItems.stream()
+                .filter(item -> item.getStatus() == OrderStatus.PROCESSING)
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }

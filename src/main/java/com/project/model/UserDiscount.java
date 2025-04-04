@@ -18,13 +18,13 @@ public class UserDiscount {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "discount_id")
-    private Discount discount;
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Discount discount;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date discountDate;
+
+    private boolean used;
 }

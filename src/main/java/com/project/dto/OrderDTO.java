@@ -2,12 +2,15 @@ package com.project.dto;
 
 import com.project.enums.OrderStatus;
 import com.project.model.Order;
+import com.project.model.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -18,7 +21,7 @@ public class OrderDTO {
     private String customerName;
     private String customerEmail;
     private Date orderDate;
-    private OrderStatus status;
+    private List<OrderItemDTO> orderItem;
     private BigDecimal totalAmount;
     private String shippingAddress;
 
@@ -27,7 +30,7 @@ public class OrderDTO {
         this.customerName = order.getUser() != null ? order.getUser().getFullname() : null;
         this.customerEmail = order.getUser() != null ? order.getUser().getUsername() : null;
         this.orderDate = order.getOrder_date();
-        this.status = order.getStatus();
+        this.orderItem = order.getOrderItems().stream().map(OrderItemDTO::new).collect(Collectors.toList());
         this.totalAmount = order.getTotalAmount();
         this.shippingAddress = order.getShippingAddress();
     }

@@ -75,4 +75,12 @@ public class ReviewService {
     public void deleteReview(int reviewId) throws NotFoundException {
 
     }
+
+    public List<ReviewDTO> getAllReviewsFromSeller() throws NotFoundException {
+        String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : null;
+        User user = userRepository.findByEmail(email).get();
+
+        List<Review> reviews = reviewRepository.findAllReviewsBySellerId(user.getId());
+        return reviews.stream().map(ReviewDTO::new).collect(Collectors.toList());
+    }
 }
