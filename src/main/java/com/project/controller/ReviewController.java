@@ -30,4 +30,10 @@ public class ReviewController {
         List<ReviewDTO> listReview = reviewService.getAllReviewsByProduct(product_id);
         return ResponseEntity.status(HttpStatus.OK).body(listReview);
     }
+
+    @GetMapping()
+    public ResponseEntity<List<ReviewDTO>> getAllReviews() throws NotFoundException {
+        List<ReviewDTO> list = reviewService.getAllReviewsFromSeller();
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
 }

@@ -20,6 +20,7 @@ public class ReviewDTO {
     private Date reviewDate;
 
     public ReviewDTO(Review review) {
+        this.id = review.getId();
         this.customerName = review.getUser().getFullname();
         this.rating = review.getRating();
         this.productName = review.getProduct().getName();

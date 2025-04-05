@@ -13,5 +13,6 @@ import java.util.List;
 public class OrderRequestDTO {
     private PaymentMethod paymentMethod;
     private String shippingAddress;
+    private String discountCode;
 }
 

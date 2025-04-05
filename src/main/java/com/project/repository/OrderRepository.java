@@ -20,6 +20,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findByUser(User user);
 
-    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.orderItems oi WHERE o.user.id = :userId AND oi.product.id = :productId AND o.status = :status")
+    @Query("SELECT COUNT(o) > 0 FROM OrderItem o WHERE o.product.user.id = :userId AND o.product.id = :productId AND o.status = :status")
     boolean existsByUserIdAndProductIdAndStatus(@Param("userId") int userId, @Param("productId") int productId, @Param("status") OrderStatus status);
 }

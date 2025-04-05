@@ -34,18 +34,28 @@ public class OrderService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
     private final PaymentRepository paymentRepository;
+    private final UserDiscountRepository userDiscountRepository;
 
+    private BigDecimal applyDiscount(BigDecimal amount, UserDiscount userDiscount) {
+        if (userDiscount != null && userDiscount.getDiscount() != null) {
+            BigDecimal discountValue = BigDecimal.valueOf(userDiscount.getDiscount().getValue());
+            return amount.subtract(discountValue);
+        }
+        return amount;
+    }
+
+    @Transactional
     public OrderDTO createDirectOrder(int product_id, OrderRequestDTO orderRequest)
             throws ExistException, NotAllowException {
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
         User user = userRepository.findByEmail(email).get();
+        System.out.println(user);
 
         Order order = new Order();
         order.setUser(user);
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setOrder_date(new Date());
         order.setCreated_at(new Date());
-        order.setStatus(OrderStatus.PENDING);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -59,10 +69,24 @@ public class OrderService {
         orderItem.setOrder(order);
         orderItem.setQuantity(1);
         orderItem.setPrice(product.getPrice());
-
-        totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
+        orderItem.setStatus(OrderStatus.PROCESSING);
 
         orderItems.add(orderItem);
+
+        order.setOrderItems(orderItems);
+        totalAmount = order.calculateApprovedTotal();
+        if (orderRequest.getDiscountCode() != null) {
+            UserDiscount userDiscount = userDiscountRepository.findByUserAndDiscountCode(user, orderRequest.getDiscountCode())
+                    .orElseThrow(() -> new ExistException("Invalid discount code"));
+
+            if (userDiscount.isUsed()) {
+                throw new ExistException("Discount code already used");
+            }
+
+            totalAmount = applyDiscount(totalAmount, userDiscount);
+            userDiscount.setUsed(true);
+            userDiscountRepository.save(userDiscount);
+        }
         order.setTotalAmount(totalAmount);
         Order orderSaved = orderRepository.save(order);
 
@@ -90,7 +114,7 @@ public class OrderService {
         }
 
         List<CartItemDTO> cartItemDTOS = shoppingCart.getCartItems().stream().map(CartItemDTO::new)
-                .collect(Collectors.toList());
+                .toList();
 
         if (cartItemDTOS.isEmpty()) {
             throw new ExistException("Cart is empty, cannot place order.");
@@ -101,7 +125,6 @@ public class OrderService {
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setOrder_date(new Date());
         order.setCreated_at(new Date());
-        order.setStatus(OrderStatus.PENDING);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -116,14 +139,13 @@ public class OrderService {
             }
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPrice(cartItem.getProduct().getPrice());
-
-            totalAmount = totalAmount
-                    .add(cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+            orderItem.setStatus(OrderStatus.PROCESSING);
 
             orderItems.add(orderItem);
         }
 
-        order.setTotalAmount(totalAmount);
+        order.setOrderItems(orderItems);
+        order.setTotalAmount(order.calculateApprovedTotal());
         Order orderSaved = orderRepository.save(order);
 
         orderItemRepository.saveAll(orderItems);
@@ -147,8 +169,8 @@ public class OrderService {
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(order.getId());
         orderDTO.setShippingAddress(order.getShippingAddress());
-        orderDTO.setStatus(order.getStatus());
         orderDTO.setTotalAmount(order.getTotalAmount());
+        orderDTO.setOrderItem(order.getOrderItems().stream().map(OrderItemDTO::new).collect(Collectors.toList()));
         orderDTO.setOrderDate(order.getOrder_date());
         orderDTO.setCustomerName(order.getUser().getFullname());
         orderDTO.setCustomerEmail(order.getUser().getEmail());
@@ -177,28 +199,39 @@ public class OrderService {
         return pagination;
     }
 
-    public OrderDTO updateOrderStatus(int id, String status) throws NotFoundException {
-        Optional<Order> order = orderRepository.findById(id);
-        if (order.isEmpty()) {
+    public OrderItemDTO updateItemStatus(int itemId, OrderStatus status) throws NotFoundException {
+        Optional<OrderItem> item = orderItemRepository.findById(itemId);
+        if (item.isEmpty()) {
             throw new NotFoundException("Order not found");
         }
-        OrderStatus statusUpdate = OrderStatus.valueOf(status);
 
-        order.get().setStatus(statusUpdate);
-        Order orderSaved = orderRepository.save(order.get());
+        if (item.get().getProduct().getStockQuantity() < item.get().getQuantity() && status == OrderStatus.PROCESSING) {
+            throw new RuntimeException("Insufficient stock");
+        }
 
-        return convertToDTO(orderSaved);
+        item.get().setStatus(status);
+        OrderItem orderSaved = orderItemRepository.save(item.get());
+
+        return new OrderItemDTO(orderSaved);
     }
 
-    public List<OrderDTO> getOrderOfMe() {
+    public OrderDTO getOrder(int orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setTotalAmount(order.calculateApprovedTotal());
+
+        return convertToDTO(order);
+    }
+
+    public List<OrderItemDTO> getOrderOfMe() {
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
         User user = userRepository.findByEmail(email).get();
 
-        List<Order> order = orderRepository.findByUser(user);
+        List<OrderItem> order = orderItemRepository.findByProductUser(user.getEmail());
 
-        List<OrderDTO> listOrderDTO = order.stream()
-                .map(this::convertToDTO)
+        List<OrderItemDTO> listItemDTO = order.stream()
+                .map(OrderItemDTO::new)
                 .collect(Collectors.toList());
-        return listOrderDTO;
+        return listItemDTO;
     }
 }

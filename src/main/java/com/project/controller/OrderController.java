@@ -1,8 +1,10 @@
 package com.project.controller;
 
 import com.project.dto.OrderDTO;
+import com.project.dto.OrderItemDTO;
 import com.project.dto.OrderRequestDTO;
 import com.project.dto.Pagination;
+import com.project.enums.OrderStatus;
 import com.project.exception.ExistException;
 import com.project.exception.NotAllowException;
 import com.project.exception.NotFoundException;
@@ -24,6 +26,12 @@ import java.util.Map;
 public class OrderController {
     private final OrderService orderService;
 
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDTO> getOrder(@PathVariable int orderId) {
+        OrderDTO order = orderService.getOrder(orderId);
+        return ResponseEntity.ok(order);
+    }
+
     @PostMapping("/order-direct/{id}")
     public ResponseEntity<OrderDTO> orderDirect(@PathVariable("id") int product_id, @RequestBody OrderRequestDTO orderRequestDTO) throws ExistException, NotAllowException {
         OrderDTO order = orderService.createDirectOrder(product_id, orderRequestDTO);
@@ -41,14 +49,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getAllOrders(specification, pageable));
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable int id, @RequestBody Map<String, String> requestData) throws NotFoundException {
-        OrderDTO orderDTO = orderService.updateOrderStatus(id, String.valueOf(requestData.get("status")));
-        return ResponseEntity.ok(orderDTO);
+    @PutMapping("/item/{itemId}/status")
+    public ResponseEntity<OrderItemDTO> updateOrderStatus(@PathVariable int itemId, @RequestBody Map<String, String> requestData) throws NotFoundException {
+        OrderItemDTO orderItemDTO = orderService.updateItemStatus(itemId, OrderStatus.valueOf(String.valueOf(requestData.get("status"))));
+        return ResponseEntity.ok(orderItemDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getOrderOfMe()  {
+    public ResponseEntity<List<OrderItemDTO>> getOrderOfMe() {
         return ResponseEntity.ok(orderService.getOrderOfMe());
     }
 }

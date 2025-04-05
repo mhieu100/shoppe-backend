@@ -13,6 +13,7 @@ import com.project.repository.CategoryRepository;
 import com.project.repository.ProductImageRepository;
 import com.project.repository.ProductRepository;
 import com.project.repository.UserRepository;
+import com.project.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,9 +42,13 @@ public class ProductService {
 
         Category category = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
-        User user = userRepository.findById(7)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
+
+        User user = userRepository.findById(2)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println(Arrays.toString(images));
+
         Product product = new Product();
 
         product.setCategory(category);
@@ -86,8 +91,10 @@ public class ProductService {
         product.setStockQuantity(productDTO.getStockQuantity());
         product.setCategory(category);
 
-        User user = userRepository.findById(7)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+        String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         product.setUser(user);
 
         product.setUpdate_at(new Date());

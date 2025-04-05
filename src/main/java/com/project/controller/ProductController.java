@@ -26,6 +26,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class ProductController {
     @Autowired
     private final ProductService productService;
@@ -38,7 +39,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification,
-            Pageable pageable) {
+                                                                      Pageable pageable) {
         return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable));
     }
 
@@ -50,7 +51,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponseDTO> createProduct(@ModelAttribute ProductDTO productDTO,
-            @RequestParam("images") MultipartFile[] images) {
+                                                            @RequestParam("images") MultipartFile[] images) {
 
         ProductResponseDTO product = productService.addProduct(productDTO, images);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
@@ -58,8 +59,8 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") int id,
-            @ModelAttribute ProductDTO product,
-            @RequestParam(value = "images", required = false) MultipartFile[] images) throws ExistException {
+                                                            @ModelAttribute ProductDTO product,
+                                                            @RequestParam(value = "images", required = false) MultipartFile[] images) throws ExistException {
         ProductResponseDTO product1 = productService.updateProduct(id, product, images);
         return ResponseEntity.ok().body(product1);
     }
@@ -73,8 +74,8 @@ public class ProductController {
 
     @PutMapping("/{productId}/replace-image/{imageId}")
     public ResponseEntity<ProductImage> replaceImage(@PathVariable("productId") int productId,
-            @PathVariable("imageId") int imageId,
-            @RequestParam("image") MultipartFile image) throws ExistException {
+                                                     @PathVariable("imageId") int imageId,
+                                                     @RequestParam("image") MultipartFile image) throws ExistException {
         ProductImage productImage = productImageRepository.findById(imageId)
                 .orElseThrow(() -> new ExistException("Image not found"));
 
