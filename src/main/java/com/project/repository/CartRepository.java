@@ -10,4 +10,5 @@ import com.project.model.User;
 @Repository
 public interface CartRepository extends JpaRepository<ShoppingCart, Integer>, JpaSpecificationExecutor<ShoppingCart> {
     ShoppingCart findByUser(User user);
+    
 }

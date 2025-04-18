@@ -19,7 +19,7 @@ public class CartItem {
     @JoinColumn(name = "cart_id")
     private ShoppingCart cart;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 

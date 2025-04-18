@@ -39,8 +39,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification,
-                                                                      Pageable pageable,@RequestParam(required = false) String searchTerm) {
-        return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable,searchTerm));
+                                                                      Pageable pageable) {
+        return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable));
     }
 
     @GetMapping("/{id}")
@@ -53,6 +53,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> createProduct(@ModelAttribute ProductDTO productDTO,
                                                             @RequestParam("images") MultipartFile[] images) {
 
+                                                                
         ProductResponseDTO product = productService.addProduct(productDTO, images);
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }

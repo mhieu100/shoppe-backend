@@ -80,7 +80,10 @@ public class CartService {
             CartItemDTO cartItemDTO = new CartItemDTO();
             cartItemDTO.setId(item.getId());
             cartItemDTO.setProductName(item.getProduct().getName());
+            cartItemDTO.setStockQuantity(item.getProduct().getStockQuantity());
             cartItemDTO.setQuantity(item.getQuantity());
+            cartItemDTO.setPrice(item.getProduct().getPrice());
+            cartItemDTO.setImageUrl(item.getProduct().getImages().get(0).getImageUrl());
             return cartItemDTO;
         }).toList());
 
@@ -90,9 +93,9 @@ public class CartService {
     public void increaseProduct(Integer id) {
         cartItemRepository.findById(id).ifPresent(cartItem -> {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
-            Product product = cartItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() - 1);
-            productRepository.save(product);
+            // Product product = cartItem.getProduct();
+            // product.setStockQuantity(product.getStockQuantity() - 1);
+            // productRepository.save(product);
             cartItemRepository.save(cartItem);
         });
     }
@@ -103,18 +106,18 @@ public class CartService {
                 cartItemRepository.delete(cartItem);
             }
             cartItem.setQuantity(cartItem.getQuantity() - 1);
-            Product product = cartItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + 1);
-            productRepository.save(product);
+            // Product product = cartItem.getProduct();
+            // product.setStockQuantity(product.getStockQuantity() + 1);
+            // productRepository.save(product);
             cartItemRepository.save(cartItem);
         });
     }
 
     public void removeProduct(Integer id) {
         cartItemRepository.findById(id).ifPresent(cartItem -> {
-            Product product = cartItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + cartItem.getQuantity());
-            productRepository.save(product);
+            // Product product = cartItem.getProduct();
+            // product.setStockQuantity(product.getStockQuantity() + cartItem.getQuantity());
+            // productRepository.save(product);
             cartItemRepository.delete(cartItem);
         });
     }
@@ -123,8 +126,6 @@ public class CartService {
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
         User user = userRepository.findByEmail(email).get();
         ShoppingCart cart = cartRepository.findByUser(user);
-        cartRepository.delete(cart);
-
+        cartItemRepository.deleteAllByCartId(cart.getId());
     }
-
 }

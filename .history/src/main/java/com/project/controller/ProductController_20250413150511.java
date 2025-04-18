@@ -39,8 +39,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Pagination<ProductResponseDTO>> getProducts(@Filter Specification<Product> specification,
-                                                                      Pageable pageable,@RequestParam(required = false) String searchTerm) {
-        return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable,searchTerm));
+                                                                      Pageable pageable) {
+        return ResponseEntity.ok().body(productService.getAllProducts(specification, pageable));
     }
 
     @GetMapping("/{id}")

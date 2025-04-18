@@ -13,7 +13,6 @@ import com.project.repository.CategoryRepository;
 import com.project.repository.ProductImageRepository;
 import com.project.repository.ProductRepository;
 import com.project.repository.UserRepository;
-import com.project.specification.ProductSpecification;
 import com.project.util.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +45,7 @@ public class ProductService {
 
         String email = JwtUtils.getCurrentUserLogin().isPresent() ? JwtUtils.getCurrentUserLogin().get() : "";
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findby(2)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         System.out.println(Arrays.toString(images));
 
@@ -123,10 +122,7 @@ public class ProductService {
         return convertToDTO(updatedProduct);
     }
 
-    public Pagination<ProductResponseDTO> getAllProducts(Specification<Product> specification, Pageable pageable,String searchTerm) {
-        if(searchTerm !=null && !searchTerm.isBlank()){
-            specification = specification.and(ProductSpecification.constainTextName(searchTerm));
-        }
+    public Pagination<ProductResponseDTO> getAllProducts(Specification<Product> specification, Pageable pageable) {
         Page<Product> pageProduct = productRepository.findAll(specification, pageable);
 
         Pagination<ProductResponseDTO> pagination = new Pagination<>();
